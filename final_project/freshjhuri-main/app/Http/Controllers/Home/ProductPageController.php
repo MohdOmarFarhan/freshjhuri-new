@@ -148,7 +148,20 @@ class ProductPageController extends Controller
             ->with([
                 'category',
                 'productFeatures',
-                'sliderImages',
+                'sliderImages' => function ($query) {
+                    $query->orderBy('sort_order')->orderByDesc('id');
+                },
+                'attributes' => function ($query) {
+                    $query->orderBy('sort_order')->orderByDesc('id');
+                },
+                'nutritionFacts' => function ($query) {
+                    $query->orderBy('sort_order')->orderByDesc('id');
+                },
+                'relations' => function ($query) {
+                    $query->where('type', 'frequently_bought_together')
+                        ->orderBy('sort_order')
+                        ->orderByDesc('id');
+                },
                 'reviews' => function ($query) {
                     $query->where('is_approved', true)
                         ->with('user:id,name')
@@ -160,6 +173,11 @@ class ProductPageController extends Controller
         $variants = Variant::with(['product', 'size'])
             ->where('product_id', $product->id)
             ->get();
+
+        $ratingSummary = [
+            'avg' => round((float) $product->reviews->avg('rating'), 1),
+            'count' => (int) $product->reviews->count(),
+        ];
 
         // Fetch related products (same category, different product)
         // We fetch products and map to their first variant to match the FeaturedProducts component structure
@@ -177,11 +195,47 @@ class ProductPageController extends Controller
             return $relatedProduct->variants->first();
         })->filter()->values();
 
+        $fbtProductIds = $product->relations->pluck('related_product_id')->filter()->values()->all();
+
+        if (empty($fbtProductIds)) {
+            $fbtProductIds = Product::query()
+                ->where('category_id', $product->category_id)
+                ->where('id', '!=', $product->id)
+                ->where('status', true)
+                ->inRandomOrder()
+                ->take(3)
+                ->pluck('id')
+                ->all();
+        }
+
+        $fbtProducts = Product::query()
+            ->whereIn('id', $fbtProductIds)
+            ->where('status', true)
+            ->with([
+                'variants' => function ($query) {
+                    $query->with('size');
+                },
+            ])
+            ->get();
+
+        $fbtVariants = $fbtProducts->map(function ($p) {
+            $v = $p->variants->first();
+            if ($v) {
+                $v->setRelation('product', $p);
+            }
+            return $v;
+        })->filter()->values();
+
+        $fbtDiscountPercent = (float) ($product->relations->max('discount_percent') ?? 5);
+
         return Inertia::render('Home/ProductDetailsPage', [
             'product' => $product,
             'variants' => $variants,
             'relatedVariants' => $relatedVariants,
             'reviews' => $product->reviews,
+            'ratingSummary' => $ratingSummary,
+            'fbtVariants' => $fbtVariants,
+            'fbtDiscountPercent' => $fbtDiscountPercent,
         ]);
     }
 }

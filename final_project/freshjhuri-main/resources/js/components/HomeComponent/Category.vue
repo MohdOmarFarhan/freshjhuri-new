@@ -7,7 +7,7 @@ import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
-const { locale } = useLocalization();
+const { locale, t } = useLocalization();
 
 const props = defineProps({
   categories: {
@@ -25,7 +25,8 @@ const getImageUrl = (path) => {
 };
 
 const categoryLabel = (category) => {
-  return locale.value === 'bn' ? category.name_bn : category.name_en;
+  const localizedKey = `name_${locale.value}`;
+  return category?.[localizedKey] || category?.name_en || category?.name_bn || t('category_fallback');
 };
 </script>
 
@@ -33,11 +34,10 @@ const categoryLabel = (category) => {
   <section class="w-full py-16 bg-stone-50 dark:bg-stone-950 border-y border-stone-200/50 dark:border-stone-800">
     <div class="container mx-auto px-4 md:px-12 relative">
       <h2 class="text-2xl md:text-3xl font-bold text-center text-stone-800 dark:text-stone-100 mb-10">
-        {{ locale === 'bn' ? 'নির্বাচিত ক্যাটাগরি' : 'Featured Categories' }}
+        {{ t('category') }}
       </h2>
 
       <div class="relative px-4 md:px-12">
-        <!-- Custom Navigation -->
         <button class="category-prev absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-honey-gold/80 hover:bg-honey-gold text-white shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           <ChevronLeft class="w-5 h-5" />
         </button>
@@ -71,7 +71,7 @@ const categoryLabel = (category) => {
                   :alt="categoryLabel(cat)"
                   class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
                 />
-                <span v-else class="text-4xl">📦</span>
+                <span v-else class="text-xs text-stone-400 dark:text-stone-500">No image</span>
               </div>
               <span class="text-sm font-semibold text-stone-700 dark:text-stone-300 group-hover:text-primary-green transition-colors whitespace-nowrap">
                 {{ categoryLabel(cat) }}

@@ -24,7 +24,7 @@ const breadcrumbs = [
 
 const headers = [
     { text: "Serial", value: "serial", sortable: true },
-    { text: "Icon", value: "icon", sortable: false },
+    { text: "Visual", value: "icon", sortable: false },
     { text: "Text (EN)", value: "text_en", sortable: true },
     { text: "Text (BN)", value: "text_bn", sortable: true },
     { text: "Sort Order", value: "sort_order", sortable: true },
@@ -48,6 +48,21 @@ const deleteMarquee = (id) => {
     confirmDeletion(() => {
         router.delete(route("brand-marquees.destroy", id));
     });
+};
+
+const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    if (path.startsWith('/')) return path;
+    return `/storage/${path}`;
+};
+
+const classOrStyle = (value, cssProp) => {
+    if (!value) return { className: "", style: {} };
+    if (value.startsWith('#') || value.startsWith('rgb') || value.startsWith('hsl')) {
+        return { className: "", style: { [cssProp]: value } };
+    }
+    return { className: value, style: {} };
 };
 </script>
 
@@ -92,8 +107,24 @@ const deleteMarquee = (id) => {
                                 <tr v-for="marquee in formattedMarquees" :key="marquee.id" class="crud-row">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">{{ marquee.serial }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div :class="['p-2 rounded-full inline-block', marquee.bg_color]">
-                                            <component :is="LucideIcons[marquee.icon] || LucideIcons.Shield" :class="['w-5 h-5', marquee.color]" />
+                                        <div
+                                            class="p-2 rounded-full inline-flex items-center justify-center bg-stone-100"
+                                            :class="classOrStyle(marquee.bg_color, 'backgroundColor').className"
+                                            :style="classOrStyle(marquee.bg_color, 'backgroundColor').style"
+                                        >
+                                            <img
+                                                v-if="marquee.image"
+                                                :src="getImageUrl(marquee.image)"
+                                                alt="Badge"
+                                                class="w-5 h-5 object-contain"
+                                            />
+                                            <component
+                                                v-else
+                                                :is="LucideIcons[marquee.icon] || LucideIcons.Shield"
+                                                class="w-5 h-5"
+                                                :class="classOrStyle(marquee.color, 'color').className"
+                                                :style="classOrStyle(marquee.color, 'color').style"
+                                            />
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 text-sm">{{ marquee.text_en }}</td>

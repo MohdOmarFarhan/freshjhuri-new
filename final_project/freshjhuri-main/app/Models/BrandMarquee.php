@@ -10,6 +10,7 @@ class BrandMarquee extends Model
         'text_en',
         'text_bn',
         'icon',
+        'image',
         'color',
         'bg_color',
         'sort_order',

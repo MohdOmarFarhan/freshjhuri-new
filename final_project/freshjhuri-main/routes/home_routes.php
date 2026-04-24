@@ -1,29 +1,56 @@
 <?php
 
 use App\Http\Controllers\Admin\BannarController;
+use App\Http\Controllers\Admin\BrandMarqueeController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ContactDetailsController;
 use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\FooterController;
+use App\Http\Controllers\Admin\HomepageSectionController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SocialController;
 use App\Http\Controllers\Admin\StaticBannarController;
-use App\Http\Controllers\Admin\BrandMarqueeController;
 use App\Http\Controllers\ContactPageController;
 use App\Http\Controllers\Home\ShippingChargeController;
 use Illuminate\Support\Facades\Route;
 
-// Brand Marquees
-Route::get('brand-marquees', [BrandMarqueeController::class, 'index'])->name('brand-marquees.index');
-Route::get('brand-marquees/create', [BrandMarqueeController::class, 'create'])->name('brand-marquees.create');
-Route::post('brand-marquees/store', [BrandMarqueeController::class, 'store'])->name('brand-marquees.store');
-Route::get('brand-marquees/{brand_marquee}/edit', [BrandMarqueeController::class, 'edit'])->name('brand-marquees.edit');
-Route::put('brand-marquees/update/{brand_marquee}', [BrandMarqueeController::class, 'update'])->name('brand-marquees.update');
-Route::delete('brand-marquees/delete/{brand_marquee}', [BrandMarqueeController::class, 'destroy'])->name('brand-marquees.destroy');
+Route::get('brand-marquees', [BrandMarqueeController::class, 'index'])
+    ->name('brand-marquees.index')
+    ->middleware('permission:BRAND_MARQUEE_INDEX');
+Route::get('brand-marquees/create', [BrandMarqueeController::class, 'create'])
+    ->name('brand-marquees.create')
+    ->middleware('permission:BRAND_MARQUEE_CREATE');
+Route::post('brand-marquees/store', [BrandMarqueeController::class, 'store'])
+    ->name('brand-marquees.store')
+    ->middleware('permission:BRAND_MARQUEE_CREATE');
+Route::get('brand-marquees/{brandMarquee}/edit', [BrandMarqueeController::class, 'edit'])
+    ->name('brand-marquees.edit')
+    ->middleware('permission:BRAND_MARQUEE_EDIT');
+Route::put('brand-marquees/update/{brandMarquee}', [BrandMarqueeController::class, 'update'])
+    ->name('brand-marquees.update')
+    ->middleware('permission:BRAND_MARQUEE_EDIT');
+Route::delete('brand-marquees/delete/{brandMarquee}', [BrandMarqueeController::class, 'destroy'])
+    ->name('brand-marquees.destroy')
+    ->middleware('permission:BRAND_MARQUEE_DELETE');
 
-// Homepage Sections
-use App\Http\Controllers\Admin\HomepageSectionController;
-Route::resource('homepage-sections', HomepageSectionController::class)->except(['show']);
+Route::get('homepage-sections', [HomepageSectionController::class, 'index'])
+    ->name('homepage-sections.index')
+    ->middleware('permission:HOMEPAGE_SECTION_INDEX');
+Route::get('homepage-sections/create', [HomepageSectionController::class, 'create'])
+    ->name('homepage-sections.create')
+    ->middleware('permission:HOMEPAGE_SECTION_CREATE');
+Route::post('homepage-sections', [HomepageSectionController::class, 'store'])
+    ->name('homepage-sections.store')
+    ->middleware('permission:HOMEPAGE_SECTION_CREATE');
+Route::get('homepage-sections/{homepageSection}/edit', [HomepageSectionController::class, 'edit'])
+    ->name('homepage-sections.edit')
+    ->middleware('permission:HOMEPAGE_SECTION_EDIT');
+Route::put('homepage-sections/{homepageSection}', [HomepageSectionController::class, 'update'])
+    ->name('homepage-sections.update')
+    ->middleware('permission:HOMEPAGE_SECTION_EDIT');
+Route::delete('homepage-sections/{homepageSection}', [HomepageSectionController::class, 'destroy'])
+    ->name('homepage-sections.destroy')
+    ->middleware('permission:HOMEPAGE_SECTION_DELETE');
 
 // common settings
 Route::get('bannars', [BannarController::class, 'index'])->name('bannars.index')->middleware('permission:BANNAR_INDEX');

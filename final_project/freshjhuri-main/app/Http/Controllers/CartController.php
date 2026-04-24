@@ -86,6 +86,42 @@ class CartController extends Controller
         return Redirect::route('cart.index')->with('success', 'Product added to cart!');
     }
 
+    public function addBundle(Request $request)
+    {
+        $request->validate([
+            'variant_ids' => 'required|array|min:1',
+            'variant_ids.*' => 'required|exists:variants,id',
+            'qty' => 'nullable|integer|min:1',
+        ]);
+
+        $qty = (int) ($request->input('qty', 1));
+        $variantIds = array_values(array_unique($request->input('variant_ids', [])));
+        $user = Auth::user();
+
+        foreach ($variantIds as $variantId) {
+            $variant = \App\Models\Variant::findOrFail($variantId);
+            $price = $variant->discount_price ?? $variant->price;
+
+            if ($user) {
+                $cart = Cart::firstOrNew([
+                    'user_id' => $user->id,
+                    'variant_id' => $variantId,
+                ]);
+            } else {
+                $cart = Cart::firstOrNew([
+                    'session_id' => session()->getId(),
+                    'variant_id' => $variantId,
+                ]);
+            }
+
+            $cart->qty = $cart->exists ? $cart->qty + $qty : $qty;
+            $cart->unit_price = $price;
+            $cart->save();
+        }
+
+        return Redirect::route('cart.index')->with('success', 'Bundle added to cart!');
+    }
+
     public function removeFromCart($id)
     {
         $user = Auth::user();

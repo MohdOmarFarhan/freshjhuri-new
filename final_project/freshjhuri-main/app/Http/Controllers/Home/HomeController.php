@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Home;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bannar;
+use App\Models\BrandMarquee;
 use App\Models\Category;
+use App\Models\HomepageSection;
 use App\Models\Product;
 use App\Models\Service;
+use App\Models\ServiceVideo;
 use App\Models\Variant;
 use Inertia\Inertia;
 
@@ -14,7 +17,7 @@ class HomeController extends Controller
 {
     public function homePage()
     {
-            $bannars = Bannar::with('category:id,slug,name_en,name_bn')
+        $bannars = Bannar::with('category:id,slug,name_en,name_bn')
             ->whereHas('category', function ($q) {
                 $q->where('status', true)
                     ->whereHas('products');
@@ -27,7 +30,6 @@ class HomeController extends Controller
                 }
                 return $bannar;
             });
-        // dd($bannars);
 
         $categories = Category::query()
             ->where('status', true)
@@ -86,9 +88,9 @@ class HomeController extends Controller
             return null;
         })->filter()->values();
 
-        $serviceVideos = \App\Models\ServiceVideo::where('status', true)->latest()->get();
+        $serviceVideos = ServiceVideo::where('status', true)->latest()->get();
 
-        $brandMarquees = \App\Models\BrandMarquee::where('status', true)
+        $brandMarquees = BrandMarquee::where('status', true)
             ->orderBy('sort_order')
             ->get();
 
@@ -111,13 +113,13 @@ class HomeController extends Controller
             ->take(20)
             ->get();
 
-        $homepageSectionsData = \App\Models\HomepageSection::where('status', true)
+        $homepageSectionsData = HomepageSection::where('status', true)
             ->orderBy('sort_order')
             ->get();
 
         $resolvedSections = $homepageSectionsData->map(function ($section) {
             $sectionArray = $section->toArray();
-            
+
             if ($section->type === 'category' && $section->category_id) {
                 $products = Product::with(['variants.size'])
                     ->whereHas('variants')
@@ -145,7 +147,7 @@ class HomeController extends Controller
                     ->select('variants.*')
                     ->take(20)
                     ->get();
-                    
+
                 $sectionArray['products'] = $comboVariants;
                 return $sectionArray;
             } elseif ($section->type === 'new-arrival') {
@@ -156,7 +158,6 @@ class HomeController extends Controller
                     ->take(20)
                     ->get();
             } else {
-                // featured, best-selling
                 $products = Product::with(['variants' => function ($q) use ($section) {
                     $q->whereJsonContains('product_type', $section->type);
                 }, 'variants.size'])
@@ -171,11 +172,10 @@ class HomeController extends Controller
             }
 
             $sectionProducts = $products->map(function ($product) use ($section) {
-                // For non-combo, we usually return the specific variant
                 $variant = $section->type === 'category' || $section->type === 'new-arrival' 
                     ? $product->variants->first() 
                     : $product->variants->first();
-                    
+
                 if ($variant) {
                     $variant->setRelation('product', $product);
                     return $variant;
@@ -187,8 +187,6 @@ class HomeController extends Controller
             return $sectionArray;
         });
 
-        // We can keep the old variables just in case they are needed by other components,
-        // but we'll add 'homepageSections' to pass the dynamic ones.
         return Inertia::render('HomePage', [
             'bannars' => $bannars,
             'categories' => $categories,

@@ -24,6 +24,7 @@ Route::delete('payment-media/delete/{paymentmedia}', [PaymentMediaController::cl
 Route::controller(CartController::class)->group(function () {
     Route::get('/cart', 'index')->name('cart.index');
     Route::post('/cart/add', 'addToCart')->name('cart.add');
+    Route::post('/cart/add-bundle', 'addBundle')->name('cart.addBundle');
     Route::post('/cart/update', 'updateCart')->name('cart.update');
     Route::delete('/cart/remove/{id}', 'removeFromCart')->name('cart.remove');
 });
