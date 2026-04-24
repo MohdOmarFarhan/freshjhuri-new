@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary-green: #047857;
+  --color-primary-green-hover: #065f46;
+  --color-honey-gold: #f59e0b;
+  --color-honey-gold-light: #fbbf24;
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-bengali: var(--font-hind-siliguri), sans-serif;
+  
+  --animate-drop: drop 1.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes drop {
+  0% { transform: translateY(-50px) scale(0.8); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(150px) scale(1.2); opacity: 0; }
+}
+
+.honey-drop-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.honey-drop {
+  width: 20px;
+  height: 20px;
+  background-color: var(--color-honey-gold);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  transform: rotate(45deg);
+  box-shadow: inset -3px -3px 5px rgba(0,0,0,0.1), 0 0 10px rgba(245, 158, 11, 0.5);
+  animation: drop 1.5s infinite;
+}
+
+.honey-drop::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  right: 15%;
+  width: 4px;
+  height: 4px;
+  background-color: rgba(255,255,255,0.8);
+  border-radius: 50%;
+}
+
+.glass-header {
+  @apply bg-white/70 backdrop-blur-md border-b border-gray-200/50;
+}

@@ -1,0 +1,18 @@
+{
+    "cart_title": "Your Shopping Cart",
+    "cart_empty_title": "Your cart is empty",
+    "cart_empty_desc": "Looks like you haven't added anything to your cart yet.",
+    "start_shopping": "Start Shopping",
+    "size": "Size",
+    "sku": "SKU",
+    "price": "Price",
+    "subtotal": "Subtotal",
+    "order_summary": "Order Summary",
+    "items": "Items",
+    "shipping": "Shipping",
+    "shipping_calculated": "Calculated at checkout",
+    "total": "Total",
+    "proceed_checkout": "Proceed to Checkout",
+    "buy_more": "Add More Product",
+    "we_accept": "We accept"
+}

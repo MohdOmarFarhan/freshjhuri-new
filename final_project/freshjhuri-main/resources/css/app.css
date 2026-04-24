@@ -1,0 +1,432 @@
+/* Product Card Hover Effect */
+.product-card-hover {
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform, box-shadow;
+}
+
+.product-card-hover:hover,
+.product-card-hover:focus-visible,
+.group:hover .product-card-hover {
+    transform: translateY(-18px) scale(1.35);
+    z-index: 10;
+    box-shadow: 0 12px 32px 0 rgba(36, 36, 36, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.04);
+}
+
+@layer components {
+    .section-bg {
+        background: var(--secondary);
+    }
+
+    .card-bg {
+        background: var(--card);
+        box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.04);
+    }
+}
+
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@custom-variant dark (&:is(.dark *));
+
+/* -------------------------------- */
+/* ✅ THEME TOKENS (SIMPLIFIED) */
+/* -------------------------------- */
+
+@theme inline {
+
+    --font-sans:
+        'Montserrat', 'Noto Sans Bengali', ui-sans-serif, system-ui, sans-serif;
+
+    --radius: 0.5rem;
+
+    /* Core Colors */
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    /* UI Surfaces */
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+
+    /* Next.js UI Extracted Colors */
+    --color-primary-green: #047857;
+    --color-primary-green-hover: #065f46;
+    --color-honey-gold: #f59e0b;
+    --color-honey-gold-light: #fbbf24;
+}
+
+/* -------------------------------- */
+/* ✅ LIGHT THEME */
+/* -------------------------------- */
+
+:root {
+    /* Crystal White Background */
+    --background: hsl(0, 0%, 100%);
+    --foreground: hsl(150, 40%, 15%);
+    /* Very dark green-grey for text, softer than black */
+
+    /* Eco-Friendly Greens */
+    /* Primary: Deep, trustworthy green (like healthy leaves/water plants) */
+    --primary: hsl(36, 86%, 56%);
+    --primary-foreground: hsl(0, 0%, 100%);
+
+    /* Accent: Vibrant, fresh growth green */
+    --accent: hsl(140, 72%, 50%);
+    --accent-foreground: hsl(150, 9%, 14%);
+
+    /* Secondary: Very subtle, almost white green tint for backgrounds */
+    --secondary: hsl(180, 5%, 92%);
+    --secondary-foreground: hsl(150, 90%, 8%);
+
+    --muted: hsl(150, 20%, 97%);
+    --muted-foreground: hsl(150, 10%, 45%);
+
+    /* Cards: Pure crystal white with subtle shadow hint */
+    --card: hsl(0, 0%, 100%);
+    --card-foreground: hsl(150, 40%, 15%);
+
+    /* Borders: Crisp, light grey-green */
+    --border: hsl(150, 20%, 92%);
+    --input: hsl(150, 20%, 94%);
+    --ring: hsl(140, 72%, 50%);
+
+    /* Navbar surfaces */
+    --navbar-shell: hsla(0, 0%, 100%, 0.82);
+    --navbar-shell-strong: hsla(0, 0%, 100%, 0.96);
+    --navbar-floating-shell: hsla(0, 0%, 100%, 0.98);
+    --navbar-surface: hsl(150, 30%, 98%);
+    --navbar-border: hsl(150, 20%, 88%);
+    --navbar-shadow: 0 16px 40px hsla(150, 20%, 20%, 0.08);
+    --navbar-ink: hsl(150, 40%, 15%);
+    --navbar-muted: hsl(150, 10%, 45%);
+    --navbar-hover: hsla(140, 72%, 50%, 0.1);
+    --navbar-active: hsl(140, 72%, 50%);
+}
+
+/* -------------------------------- */
+/* ✅ DARK THEME */
+/* -------------------------------- */
+
+.dark {
+    /* Dark eco-friendly theme (keeps brand green identity) */
+    --background: hsl(154 24% 8%);
+    --foreground: hsl(150 18% 95%);
+
+    --primary: hsl(145 74% 52%);
+    --primary-foreground: hsl(152 38% 10%);
+
+    --accent: hsl(38 94% 61%);
+    --accent-foreground: hsl(32 28% 16%);
+
+    --secondary: hsl(154 16% 14%);
+    --secondary-foreground: hsl(150 18% 92%);
+
+    --muted: hsl(154 12% 16%);
+    --muted-foreground: hsl(150 10% 72%);
+
+    --card: hsl(154 18% 12%);
+    --card-foreground: hsl(150 18% 95%);
+
+    --border: hsl(154 12% 24%);
+    --input: hsl(154 14% 18%);
+    --ring: hsl(145 74% 52%);
+
+    /* Navbar surfaces */
+    --navbar-shell: hsla(154, 24%, 8%, 0.78);
+    --navbar-shell-strong: hsla(154, 22%, 10%, 0.95);
+    --navbar-floating-shell: hsla(154, 24%, 8%, 0.98);
+    --navbar-surface: hsl(154, 18%, 13%);
+    --navbar-border: hsl(154, 14%, 24%);
+    --navbar-shadow: 0 24px 60px hsla(154, 40%, 3%, 0.55);
+    --navbar-ink: hsl(150, 18%, 95%);
+    --navbar-muted: hsl(150, 10%, 72%);
+    --navbar-hover: hsla(145, 74%, 52%, 0.16);
+    --navbar-active: hsl(145, 74%, 52%);
+}
+
+/* -------------------------------- */
+/* ✅ BASE LAYER */
+/* -------------------------------- */
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+
+    body {
+        @apply bg-background text-foreground font-sans;
+        min-height: 100vh;
+        background-image:
+            radial-gradient(circle at 12% 18%, hsla(145, 68%, 45%, 0.12), transparent 34%),
+            radial-gradient(circle at 82% 0%, hsla(38, 94%, 61%, 0.12), transparent 28%);
+        background-attachment: fixed;
+    }
+
+    .dark body {
+        background-image:
+            radial-gradient(circle at 8% 14%, hsla(145, 74%, 52%, 0.16), transparent 38%),
+            radial-gradient(circle at 88% 4%, hsla(38, 94%, 61%, 0.16), transparent 30%),
+            linear-gradient(180deg, hsl(154 26% 8%), hsl(154 24% 7%));
+    }
+
+    ::selection {
+        background: color-mix(in srgb, var(--primary) 35%, transparent);
+        color: var(--foreground);
+    }
+}
+
+@layer components {
+    .navbar-shell {
+        color: var(--navbar-ink);
+        transition:
+            color 300ms ease,
+            background-color 300ms ease,
+            border-color 300ms ease,
+            box-shadow 300ms ease;
+    }
+
+    .navbar-panel {
+        border-bottom: 1px solid var(--navbar-border);
+        background: var(--navbar-shell);
+        backdrop-filter: blur(24px);
+        box-shadow: var(--navbar-shadow);
+        transition:
+            background-color 300ms ease,
+            border-color 300ms ease,
+            box-shadow 300ms ease;
+    }
+
+    .navbar-panel--floating {
+        background: var(--navbar-floating-shell);
+        border-bottom-color: var(--navbar-border);
+        box-shadow: var(--navbar-shadow);
+    }
+
+    .navbar-panel--strong {
+        background: var(--navbar-shell-strong);
+    }
+
+    .navbar-logo {
+        background: var(--navbar-surface);
+        border: 1px solid var(--navbar-border);
+        box-shadow: inset 0 1px 0 hsla(0, 0%, 100%, 0.18);
+    }
+
+    .dark .navbar-logo,
+    .dark .navbar-button,
+    .dark .navbar-link,
+    .dark .navbar-search,
+    .dark .navbar-dropdown {
+        box-shadow:
+            inset 0 1px 0 hsla(0, 0%, 100%, 0.03),
+            0 10px 24px hsla(154, 30%, 4%, 0.35);
+    }
+
+    .navbar-search {
+        background: var(--navbar-surface);
+        border-color: var(--navbar-border);
+        color: var(--navbar-ink);
+    }
+
+    .navbar-button {
+        background: var(--navbar-surface);
+        border: 1px solid var(--navbar-border);
+        color: var(--navbar-ink);
+        transition:
+            background-color 200ms ease,
+            border-color 200ms ease,
+            color 200ms ease,
+            transform 200ms ease;
+    }
+
+    .navbar-button:hover {
+        background: var(--navbar-hover);
+    }
+
+    .navbar-button:focus-visible {
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--navbar-active) 20%, transparent);
+        outline: none;
+    }
+
+    .navbar-dropdown {
+        background: var(--navbar-shell-strong);
+        border: 1px solid var(--navbar-border);
+        box-shadow: var(--navbar-shadow);
+    }
+
+    .navbar-dropdown-item {
+        background: var(--navbar-surface);
+        color: var(--navbar-ink);
+        transition: background-color 200ms ease, color 200ms ease;
+    }
+
+    .navbar-dropdown-item:hover {
+        background: var(--navbar-hover);
+    }
+
+    .navbar-link {
+        border: 1px solid var(--navbar-border);
+        background: var(--navbar-surface);
+        color: var(--navbar-ink);
+        transition:
+            background-color 200ms ease,
+            border-color 200ms ease,
+            color 200ms ease;
+    }
+
+    .navbar-link:hover {
+        background: var(--navbar-hover);
+    }
+
+    .navbar-link--active {
+        border-color: transparent;
+        background: var(--navbar-active);
+        color: var(--primary-foreground);
+    }
+
+    .navbar-mobile-overlay {
+        background: hsla(150, 18%, 4%, 0.42);
+    }
+
+    .navbar-mobile-sheet {
+        background: var(--navbar-shell-strong);
+        color: var(--navbar-ink);
+    }
+
+    .crud-table-wrap {
+        overflow-x: auto;
+        border-radius: 0.5rem;
+        border: 1px solid var(--border);
+        background: var(--card);
+    }
+
+    .crud-table {
+        width: 100%;
+        min-width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .crud-table-head {
+        background: var(--muted);
+    }
+
+    .crud-table-body {
+        background: var(--card);
+    }
+
+    .crud-row {
+        transition: background-color 160ms ease;
+    }
+
+    .crud-row:hover {
+        background: color-mix(in srgb, var(--accent) 8%, var(--card));
+    }
+
+    .crud-th {
+        padding: 0.75rem 1.5rem;
+        text-align: left;
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.025em;
+        text-transform: uppercase;
+        color: var(--muted-foreground);
+    }
+
+    .crud-td {
+        padding: 1rem 1.5rem;
+        font-size: 0.875rem;
+        color: var(--card-foreground);
+        border-top: 1px solid var(--border);
+    }
+
+    .product-details-shell {
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        background: var(--card);
+        box-shadow: 0 1px 2px hsla(0, 0%, 0%, 0.04);
+    }
+
+    .product-details-panel {
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        background: var(--card);
+    }
+
+    .product-details-muted {
+        background: var(--muted);
+    }
+
+    .product-details-surface {
+        background: var(--card);
+        border: 1px solid var(--border);
+    }
+
+    .product-details-thumb {
+        background: var(--card);
+        border: 1px solid var(--border);
+        transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+    }
+
+    .product-details-thumb:hover {
+        border-color: var(--primary);
+    }
+
+    .product-details-thumb--active {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 35%, transparent);
+    }
+
+    .product-details-main-image {
+        background: var(--card);
+        border: 1px solid var(--border);
+    }
+
+    .product-details-tab {
+        background: var(--muted);
+        color: var(--muted-foreground);
+        transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    .product-details-tab:hover {
+        background: color-mix(in srgb, var(--primary) 12%, var(--muted));
+        color: var(--card-foreground);
+    }
+
+    .product-details-tab--active {
+        background: var(--primary);
+        color: var(--primary-foreground);
+    }
+
+    .product-details-badge {
+        border-radius: 9999px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .product-details-feature-list li {
+        border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+        background: color-mix(in srgb, var(--muted) 55%, transparent);
+        border-radius: 0.5rem;
+    }
+
+}

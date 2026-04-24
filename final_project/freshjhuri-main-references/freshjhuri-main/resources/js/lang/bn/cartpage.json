@@ -1,0 +1,18 @@
+{
+    "cart_title": "আপনার শপিং কার্ট",
+    "cart_empty_title": "আপনার কার্ট খালি",
+    "cart_empty_desc": "মনে হচ্ছে আপনি এখনও আপনার কার্টে কিছু যোগ করেননি।",
+    "start_shopping": "কেনাকাটা শুরু করুন",
+    "size": "সাইজ",
+    "sku": "এসকেইউ",
+    "price": "দাম",
+    "subtotal": "মোট দাম",
+    "order_summary": "অর্ডার সারাংশ",
+    "items": "আইটেম",
+    "shipping": "শিপিং",
+    "shipping_calculated": "চেকআউটে গণনা করা হবে",
+    "total": "সর্বমোট",
+    "proceed_checkout": "চেকআউটে এগিয়ে যান",
+    "buy_more": "আরও পণ্য যোগ করুন",
+    "we_accept": "আমরা গ্রহণ করি"
+}
