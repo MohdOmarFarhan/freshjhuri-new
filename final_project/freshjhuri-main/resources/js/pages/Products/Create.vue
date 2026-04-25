@@ -12,6 +12,7 @@ import AppLayout from "@/layouts/AppLayout.vue";
 
 const props = defineProps({
   categories: Array,
+  products: Array,
   errors: Object
 });
 
@@ -27,18 +28,30 @@ const form = useForm({
   title_bn: "",
   short_desc_en: "",
   short_desc_bn: "",
+  badge_en: "",
+  badge_bn: "",
   description_en: "",
   description_bn: "",
+  origin_story_en: "",
+  origin_story_bn: "",
   conservation_en: "",
   conservation_bn: "",
   status: "1",
   is_free_shipping: false,
+  is_organic: false,
+  is_sugar_free: false,
+  is_pre_order: false,
+  is_top_selling: false,
   sort_order: "",
   season: "ongoing",
   feature_image: null,
   hover_image: null,
+  video_url: "",
   features: [],
   slider_images: [],
+  attributes: [],
+  nutrition_facts: [],
+  fbt_relations: [],
 });
 
 const fieldError = (path) => (props.errors && props.errors[path]) || "";
@@ -124,6 +137,27 @@ const addFeature = () => {
 };
 const removeFeature = (index) => {
   form.features.splice(index, 1);
+};
+
+const addAttribute = () => {
+  form.attributes.push({ key: "", label_en: "", label_bn: "", value_en: "", value_bn: "", sort_order: form.attributes.length + 1 });
+};
+const removeAttribute = (index) => {
+  form.attributes.splice(index, 1);
+};
+
+const addNutritionFact = () => {
+  form.nutrition_facts.push({ name_en: "", name_bn: "", value: "", unit: "", per_quantity: 100, per_unit: "g", sort_order: form.nutrition_facts.length + 1 });
+};
+const removeNutritionFact = (index) => {
+  form.nutrition_facts.splice(index, 1);
+};
+
+const addFbtRelation = () => {
+  form.fbt_relations.push({ related_product_id: "", discount_percent: 5, sort_order: form.fbt_relations.length + 1 });
+};
+const removeFbtRelation = (index) => {
+  form.fbt_relations.splice(index, 1);
 };
 </script>
 
@@ -234,6 +268,16 @@ const removeFeature = (index) => {
                 <Textarea v-model="form.short_desc_bn" rows="3" class="resize-none" />
               </div>
 
+              <div class="space-y-2">
+                <Label>Badge (EN)</Label>
+                <Input v-model="form.badge_en" placeholder="Best Seller / Imported / Premium" />
+              </div>
+
+              <div class="space-y-2">
+                <Label>Badge (BN)</Label>
+                <Input v-model="form.badge_bn" placeholder="Best Seller / Imported / Premium" />
+              </div>
+
               <div class="space-y-2 md:col-span-2">
                 <Label>Description (EN)</Label>
                 <Textarea v-model="form.description_en" rows="4" class="resize-none" />
@@ -242,6 +286,16 @@ const removeFeature = (index) => {
               <div class="space-y-2 md:col-span-2">
                 <Label>Description (BN)</Label>
                 <Textarea v-model="form.description_bn" rows="4" class="resize-none" />
+              </div>
+
+              <div class="space-y-2 md:col-span-2">
+                <Label>Origin Story (EN)</Label>
+                <Textarea v-model="form.origin_story_en" rows="4" class="resize-none" />
+              </div>
+
+              <div class="space-y-2 md:col-span-2">
+                <Label>Origin Story (BN)</Label>
+                <Textarea v-model="form.origin_story_bn" rows="4" class="resize-none" />
               </div>
 
               <div class="space-y-2 md:col-span-2">
@@ -267,7 +321,32 @@ const removeFeature = (index) => {
                 <span v-if="errors?.is_free_shipping" class="text-sm text-red-500">{{ errors.is_free_shipping }}</span>
               </div>
 
-              <div></div>
+              <div class="space-y-2">
+                <Label>Flags</Label>
+                <div class="mt-2 grid grid-cols-2 gap-3">
+                  <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" v-model="form.is_organic" class="rounded border-gray-300" />
+                    Organic
+                  </label>
+                  <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" v-model="form.is_sugar_free" class="rounded border-gray-300" />
+                    Sugar Free
+                  </label>
+                  <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" v-model="form.is_pre_order" class="rounded border-gray-300" />
+                    Pre-order
+                  </label>
+                  <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" v-model="form.is_top_selling" class="rounded border-gray-300" />
+                    Top selling
+                  </label>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <Label>Video URL</Label>
+                <Input v-model="form.video_url" placeholder="https://youtube.com/..." />
+              </div>
 
               <div class="space-y-2">
                 <Label>Feature Image</Label>
@@ -344,6 +423,84 @@ const removeFeature = (index) => {
                     </div>
                   </div>
                   <Button type="button" variant="outline" size="sm" @click="removeFeature(index)">Remove</Button>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-border pt-6">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-foreground">Attributes</h2>
+                <Button type="button" size="sm" @click="addAttribute">Add Attribute</Button>
+              </div>
+              <div class="space-y-3">
+                <div
+                  v-for="(row, index) in form.attributes"
+                  :key="index"
+                  class="grid grid-cols-1 md:grid-cols-6 gap-3 items-center p-3 bg-muted/40 rounded-lg"
+                >
+                  <Input v-model="row.key" placeholder="key" />
+                  <Input v-model="row.label_en" placeholder="Label EN" />
+                  <Input v-model="row.label_bn" placeholder="Label BN" />
+                  <Input v-model="row.value_en" placeholder="Value EN" />
+                  <Input v-model="row.value_bn" placeholder="Value BN" />
+                  <div class="flex items-center gap-2">
+                    <Input v-model="row.sort_order" type="number" min="0" placeholder="#" class="w-24" />
+                    <Button type="button" variant="outline" size="sm" @click="removeAttribute(index)">Remove</Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-border pt-6">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-foreground">Nutrition Facts</h2>
+                <Button type="button" size="sm" @click="addNutritionFact">Add Fact</Button>
+              </div>
+              <div class="space-y-3">
+                <div
+                  v-for="(row, index) in form.nutrition_facts"
+                  :key="index"
+                  class="grid grid-cols-1 md:grid-cols-7 gap-3 items-center p-3 bg-muted/40 rounded-lg"
+                >
+                  <Input v-model="row.name_en" placeholder="Name EN" />
+                  <Input v-model="row.name_bn" placeholder="Name BN" />
+                  <Input v-model="row.value" placeholder="Value" />
+                  <Input v-model="row.unit" placeholder="Unit" />
+                  <Input v-model="row.per_quantity" type="number" min="0" placeholder="Per" />
+                  <Input v-model="row.per_unit" placeholder="Per unit" />
+                  <div class="flex items-center gap-2">
+                    <Input v-model="row.sort_order" type="number" min="0" placeholder="#" class="w-24" />
+                    <Button type="button" variant="outline" size="sm" @click="removeNutritionFact(index)">Remove</Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-border pt-6">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-foreground">Frequently Bought Together</h2>
+                <Button type="button" size="sm" @click="addFbtRelation">Add Item</Button>
+              </div>
+              <div class="space-y-3">
+                <div
+                  v-for="(row, index) in form.fbt_relations"
+                  :key="index"
+                  class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center p-3 bg-muted/40 rounded-lg"
+                >
+                  <div class="md:col-span-2">
+                    <select
+                      v-model="row.related_product_id"
+                      class="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="">Select product</option>
+                      <option v-for="p in products" :key="p.id" :value="p.id">{{ p.title_en }}</option>
+                    </select>
+                  </div>
+                  <Input v-model="row.discount_percent" type="number" step="0.01" min="0" max="99.99" placeholder="Discount %" />
+                  <div class="flex items-center gap-2">
+                    <Input v-model="row.sort_order" type="number" min="0" placeholder="#" class="w-24" />
+                    <Button type="button" variant="outline" size="sm" @click="removeFbtRelation(index)">Remove</Button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -724,22 +724,6 @@ onBeforeUnmount(() => {
                         <span class="text-sm font-bold text-stone-800 dark:text-stone-200">{{ attr[getLocalizedField('value')] || attr.value_en }}</span>
                       </div>
                     </div>
-
-                    <div v-if="(product?.product_features || []).length" class="mt-10">
-                      <h4 class="text-lg font-bold text-stone-800 dark:text-stone-200 mb-4">Key Features</h4>
-                      <ul class="space-y-2">
-                        <li
-                          v-for="feature in product.product_features"
-                          :key="feature.id"
-                          class="flex items-start gap-2 p-4 bg-stone-50 dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800"
-                        >
-                          <span class="mt-2 h-1.5 w-1.5 rounded-full bg-primary-green" />
-                          <span class="text-stone-700 dark:text-stone-300 text-sm font-semibold">
-                            {{ feature[getLocalizedField('feature')] || feature.feature_en }}
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
                   </div>
 
                   <div v-else-if="activeTab === 'origin'" class="space-y-6">

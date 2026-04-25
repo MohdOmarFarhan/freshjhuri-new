@@ -13,6 +13,7 @@ import AppLayout from "@/layouts/AppLayout.vue";
 const props = defineProps({
   product: Object,
   categories: Array,
+  products: Array,
   errors: Object
 });
 
@@ -29,24 +30,42 @@ const form = useForm({
   title_bn: props.product.title_bn,
   short_desc_en: props.product.short_desc_en ?? "",
   short_desc_bn: props.product.short_desc_bn ?? "",
+  badge_en: props.product.badge_en ?? "",
+  badge_bn: props.product.badge_bn ?? "",
   description_en: props.product.description_en ?? "",
   description_bn: props.product.description_bn ?? "",
+  origin_story_en: props.product.origin_story_en ?? "",
+  origin_story_bn: props.product.origin_story_bn ?? "",
   conservation_en: props.product.conservation_en ?? "",
   conservation_bn: props.product.conservation_bn ?? "",
   status: String(props.product.status),
   is_free_shipping: Boolean(props.product.is_free_shipping),
+  is_organic: Boolean(props.product.is_organic),
+  is_sugar_free: Boolean(props.product.is_sugar_free),
+  is_pre_order: Boolean(props.product.is_pre_order),
+  is_top_selling: Boolean(props.product.is_top_selling),
   sort_order: props.product.sort_order ?? '',
   season: props.product.season ?? 'ongoing',
   feature_image: null,
   hover_image: null,
+  video_url: props.product.video_url ?? "",
   features: props.product.product_features || [],
   slider_images: [],
+  attributes: props.product.attributes || [],
+  nutrition_facts: props.product.nutrition_facts || [],
+  fbt_relations: (props.product.fbt_relations || []).map((r) => ({
+    related_product_id: r.related_product_id,
+    discount_percent: r.discount_percent,
+    sort_order: r.sort_order,
+  })),
+  deleted_slider_images: [],
 });
 
 const featureImagePreview = ref(null);
 const hoverImagePreview = ref(null);
 const featureInput = ref(null);
 const hoverInput = ref(null);
+const existingSliderImages = ref([...(props.product.slider_images || [])]);
 
 const submit = () => {
   form.post(route("products.update", props.product.id), {
@@ -103,13 +122,11 @@ const onSliderImagesChange = (e) => {
 
 const deleteSliderImage = (id) => {
   if (confirm("Are you sure you want to delete this image?")) {
-    router.delete(route("products.slider-image.delete", id), {
-      preserveScroll: true,
-      onSuccess: () => {
-        // Optimistically remove from props or just rely on Inertia
-        // Since we are preserving scroll, user stays on page.
-      }
-    });
+    form.deleted_slider_images.push(id);
+    const idx = existingSliderImages.value.findIndex((x) => x.id === id);
+    if (idx >= 0) {
+      existingSliderImages.value.splice(idx, 1);
+    }
   }
 };
 
@@ -118,6 +135,27 @@ const addFeature = () => {
 };
 const removeFeature = (index) => {
   form.features.splice(index, 1);
+};
+
+const addAttribute = () => {
+  form.attributes.push({ key: "", label_en: "", label_bn: "", value_en: "", value_bn: "", sort_order: form.attributes.length + 1 });
+};
+const removeAttribute = (index) => {
+  form.attributes.splice(index, 1);
+};
+
+const addNutritionFact = () => {
+  form.nutrition_facts.push({ name_en: "", name_bn: "", value: "", unit: "", per_quantity: 100, per_unit: "g", sort_order: form.nutrition_facts.length + 1 });
+};
+const removeNutritionFact = (index) => {
+  form.nutrition_facts.splice(index, 1);
+};
+
+const addFbtRelation = () => {
+  form.fbt_relations.push({ related_product_id: "", discount_percent: 5, sort_order: form.fbt_relations.length + 1 });
+};
+const removeFbtRelation = (index) => {
+  form.fbt_relations.splice(index, 1);
 };
 
 const fieldError = (path) => (props.errors && props.errors[path]) || "";
@@ -231,6 +269,16 @@ const fieldError = (path) => (props.errors && props.errors[path]) || "";
                 <Textarea v-model="form.short_desc_bn" rows="3" class="resize-none" />
               </div>
 
+              <div class="space-y-2">
+                <Label>Badge (EN)</Label>
+                <Input v-model="form.badge_en" placeholder="Best Seller / Imported / Premium" />
+              </div>
+
+              <div class="space-y-2">
+                <Label>Badge (BN)</Label>
+                <Input v-model="form.badge_bn" placeholder="Best Seller / Imported / Premium" />
+              </div>
+
               <div class="space-y-2 md:col-span-2">
                 <Label>Description (EN)</Label>
                 <Textarea v-model="form.description_en" rows="4" class="resize-none" />
@@ -239,6 +287,16 @@ const fieldError = (path) => (props.errors && props.errors[path]) || "";
               <div class="space-y-2 md:col-span-2">
                 <Label>Description (BN)</Label>
                 <Textarea v-model="form.description_bn" rows="4" class="resize-none" />
+              </div>
+
+              <div class="space-y-2 md:col-span-2">
+                <Label>Origin Story (EN)</Label>
+                <Textarea v-model="form.origin_story_en" rows="4" class="resize-none" />
+              </div>
+
+              <div class="space-y-2 md:col-span-2">
+                <Label>Origin Story (BN)</Label>
+                <Textarea v-model="form.origin_story_bn" rows="4" class="resize-none" />
               </div>
 
               <div class="space-y-2 md:col-span-2">
@@ -264,7 +322,32 @@ const fieldError = (path) => (props.errors && props.errors[path]) || "";
                 <span v-if="errors?.is_free_shipping" class="text-sm text-red-500">{{ errors.is_free_shipping }}</span>
               </div>
 
-              <div></div>
+              <div class="space-y-2">
+                <Label>Flags</Label>
+                <div class="mt-2 grid grid-cols-2 gap-3">
+                  <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" v-model="form.is_organic" class="rounded border-gray-300" />
+                    Organic
+                  </label>
+                  <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" v-model="form.is_sugar_free" class="rounded border-gray-300" />
+                    Sugar Free
+                  </label>
+                  <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" v-model="form.is_pre_order" class="rounded border-gray-300" />
+                    Pre-order
+                  </label>
+                  <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" v-model="form.is_top_selling" class="rounded border-gray-300" />
+                    Top selling
+                  </label>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <Label>Video URL</Label>
+                <Input v-model="form.video_url" placeholder="https://youtube.com/..." />
+              </div>
 
               <div class="space-y-2">
                 <Label>Feature Image</Label>
@@ -378,10 +461,88 @@ const fieldError = (path) => (props.errors && props.errors[path]) || "";
             </div>
 
             <div class="border-t border-border pt-6">
-              <Label>Slider Images (Append new)</Label>
-              <div v-if="product.slider_images?.length" class="flex flex-wrap gap-4 mb-4 mt-3">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-foreground">Attributes</h2>
+                <Button type="button" size="sm" @click="addAttribute">Add Attribute</Button>
+              </div>
+              <div class="space-y-3">
                 <div
-                  v-for="img in product.slider_images"
+                  v-for="(row, index) in form.attributes"
+                  :key="index"
+                  class="grid grid-cols-1 md:grid-cols-6 gap-3 items-center p-3 bg-muted/40 rounded-lg"
+                >
+                  <Input v-model="row.key" placeholder="key" />
+                  <Input v-model="row.label_en" placeholder="Label EN" />
+                  <Input v-model="row.label_bn" placeholder="Label BN" />
+                  <Input v-model="row.value_en" placeholder="Value EN" />
+                  <Input v-model="row.value_bn" placeholder="Value BN" />
+                  <div class="flex items-center gap-2">
+                    <Input v-model="row.sort_order" type="number" min="0" placeholder="#" class="w-24" />
+                    <Button type="button" variant="outline" size="sm" @click="removeAttribute(index)">Remove</Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-border pt-6">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-foreground">Nutrition Facts</h2>
+                <Button type="button" size="sm" @click="addNutritionFact">Add Fact</Button>
+              </div>
+              <div class="space-y-3">
+                <div
+                  v-for="(row, index) in form.nutrition_facts"
+                  :key="index"
+                  class="grid grid-cols-1 md:grid-cols-7 gap-3 items-center p-3 bg-muted/40 rounded-lg"
+                >
+                  <Input v-model="row.name_en" placeholder="Name EN" />
+                  <Input v-model="row.name_bn" placeholder="Name BN" />
+                  <Input v-model="row.value" placeholder="Value" />
+                  <Input v-model="row.unit" placeholder="Unit" />
+                  <Input v-model="row.per_quantity" type="number" min="0" placeholder="Per" />
+                  <Input v-model="row.per_unit" placeholder="Per unit" />
+                  <div class="flex items-center gap-2">
+                    <Input v-model="row.sort_order" type="number" min="0" placeholder="#" class="w-24" />
+                    <Button type="button" variant="outline" size="sm" @click="removeNutritionFact(index)">Remove</Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-border pt-6">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-foreground">Frequently Bought Together</h2>
+                <Button type="button" size="sm" @click="addFbtRelation">Add Item</Button>
+              </div>
+              <div class="space-y-3">
+                <div
+                  v-for="(row, index) in form.fbt_relations"
+                  :key="index"
+                  class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center p-3 bg-muted/40 rounded-lg"
+                >
+                  <div class="md:col-span-2">
+                    <select
+                      v-model="row.related_product_id"
+                      class="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="">Select product</option>
+                      <option v-for="p in products" :key="p.id" :value="p.id">{{ p.title_en }}</option>
+                    </select>
+                  </div>
+                  <Input v-model="row.discount_percent" type="number" step="0.01" min="0" max="99.99" placeholder="Discount %" />
+                  <div class="flex items-center gap-2">
+                    <Input v-model="row.sort_order" type="number" min="0" placeholder="#" class="w-24" />
+                    <Button type="button" variant="outline" size="sm" @click="removeFbtRelation(index)">Remove</Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-border pt-6">
+              <Label>Slider Images (Append new)</Label>
+              <div v-if="existingSliderImages.length" class="flex flex-wrap gap-4 mb-4 mt-3">
+                <div
+                  v-for="img in existingSliderImages"
                   :key="img.id"
                   class="relative group"
                 >
@@ -390,16 +551,7 @@ const fieldError = (path) => (props.errors && props.errors[path]) || "";
                     class="h-24 w-auto rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow object-cover"
                     alt="Slider image preview"
                   />
-                  <button
-                    type="button"
-                    @click="deleteSliderImage(img.id)"
-                    class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-200 focus:opacity-100"
-                    title="Delete image"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                  </button>
+                  <button type="button" @click="deleteSliderImage(img.id)" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-200 focus:opacity-100" title="Delete image">✕</button>
                 </div>
               </div>
               <input
